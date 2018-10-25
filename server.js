@@ -2,6 +2,25 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+//On initialise notre utilitaire node pour communiquer avec le capteur 
+//(capteur = sensor en anglais)
+const sonde = require('ds18b20');
+//Identifiant de notre capteur, remplacez les X par ce que vous avez eu précédemment.
+const sondeId = '28-01131a3eb0d1';
+
+//Initialisation de l'utilitaire Onoff pour gérer
+//les GPIOs du raspberry
+const Gpio = require('onoff').Gpio;
+//Initialisation de notre GPIO 17 pour recevoir un signal
+//Contrairement à nos LEDs avec lesquelles on envoyait un signal
+var sensor = new Gpio(17, 'in', 'both');
+
+//Fonction pour quitter le script
+function exit() {
+	sensor.unexport();
+	process.exit();
+}
+
 //Création et configuration d'un server dse websockets
 const websocket = require('ws');
 const wss = new websocket.Server({ port: 3030 });
@@ -32,6 +51,25 @@ process.stdin.on('keypress', (str, key) => {
 		sendText(str);
 	}
 });
+
+//Ici on "surveille" le GPIOs 17 (correspondant au capteur)
+//Dès qu'il y a du mouvement cette partie du code sera exécuté.
+sensor.watch(function (err, value) {
+	if(err) exit();
+	//Si le capteur détecte du mouvement 
+	//On affiche 'Mouvement détecté'
+	if(value == 1) {
+		sendText('Mouvement détecté !<br>');
+	} else {
+		sendText('Fin du mouvement.<br>');
+	}
+});
+
+setInterval(function() {
+	//code à executer toutes les x secondes
+	var temperature = sonde.temperatureSync(sondeId);
+	sendText(temperature + '<br>');
+}, 5000);
 
 //OS est un utilitaire node qui va nous servir à afficher le nom de notre raspberry
 const os = require("os");

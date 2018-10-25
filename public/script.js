@@ -3,7 +3,7 @@ $(function () {
     window.WebSocket = window.WebSocket || window.MozWebSocket;
   
     //Remplacez ici l'adresse IP par celle de votre raspberry ou par son nom
-    var connection = new WebSocket('ws://127.0.0.1:3030');
+    var connection = new WebSocket('ws:narcos.local:3030');
   
     //Appelé lorsque la websocket se connecte correctement
     connection.onopen = function () {

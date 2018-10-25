@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ds18b20": "^0.1.0",
     "express": "^4.16.4",
     "mustache": "^3.0.0",
     "mustache-express": "^1.2.8",
